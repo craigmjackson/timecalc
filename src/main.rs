@@ -1,7 +1,8 @@
 use std::io::{self, Write};
 
 fn parse_int(time_string: &str) -> Result<i64, std::num::ParseIntError> {
-    let integer: i64 = time_string.parse()?;
+    let integer: i64 = time_string.trim().parse()?;
+    println!("integer in parse_int: {}", integer);
     Ok(integer)
 }
 
@@ -9,15 +10,21 @@ fn from_string(time_string: String) -> Result<i64, std::num::ParseIntError> {
     let colon_split: Vec<&str> = time_string.split(":").collect();
     if colon_split.len() == 3 {
         let hour: i64 = parse_int(colon_split[0])?;
-        let minute: i64 = parse_int(colon_split[0])? + (hour * 60);
-        let second: i64 = parse_int(colon_split[0])? + (minute * 60);
+        let minute: i64 = parse_int(colon_split[1])? + (hour * 60);
+        let second: i64 = parse_int(colon_split[2])? + (minute * 60);
+        println!("hour: {}", hour);
+        println!("minute: {}", minute);
+        println!("second: {}", second);
         Ok(second)
     } else if colon_split.len() == 2 {
         let minute: i64 = parse_int(colon_split[0])?;
-        let second: i64 = parse_int(colon_split[0])? + (minute * 60);
+        let second: i64 = parse_int(colon_split[1])? + (minute * 60);
+        println!("minute: {}", minute);
+        println!("second: {}", second);
         Ok(second)
     } else if colon_split.len() == 1 {
         let second: i64 = parse_int(colon_split[0])?;
+        println!("second: {}", second);
         Ok(second)
     } else {
         "".parse::<i64>()
