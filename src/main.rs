@@ -1,67 +1,93 @@
 use std::io::{self, Write};
 
-fn parse_int(time_string: &str) -> Result<i64, std::num::ParseIntError> {
-    let integer: i64 = time_string.trim().parse()?;
-    println!("integer in parse_int: {}", integer);
-    Ok(integer)
+fn parse_int(time_string: &str) -> Option<i64> {
+    match time_string.trim().parse::<i64>() {
+        Ok(integer) => Some(integer),
+        Err(_) => {
+            println!("Could not parse string {}", time_string);
+            None
+        }
+    }
 }
 
-fn from_string(time_string: String) -> Result<i64, std::num::ParseIntError> {
+fn seconds_from_string(time_string: String) -> Option<i64> {
     let colon_split: Vec<&str> = time_string.split(":").collect();
     if colon_split.len() == 3 {
         let hour: i64 = parse_int(colon_split[0])?;
         let minute: i64 = parse_int(colon_split[1])? + (hour * 60);
         let second: i64 = parse_int(colon_split[2])? + (minute * 60);
-        println!("hour: {}", hour);
-        println!("minute: {}", minute);
-        println!("second: {}", second);
-        Ok(second)
+        Some(second)
     } else if colon_split.len() == 2 {
         let minute: i64 = parse_int(colon_split[0])?;
         let second: i64 = parse_int(colon_split[1])? + (minute * 60);
-        println!("minute: {}", minute);
-        println!("second: {}", second);
-        Ok(second)
+        Some(second)
     } else if colon_split.len() == 1 {
         let second: i64 = parse_int(colon_split[0])?;
-        println!("second: {}", second);
-        Ok(second)
+        Some(second)
     } else {
-        "".parse::<i64>()
+        println!("Cannot parse seconds from string {}", time_string);
+        None
     }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    struct ClockTime {
-        second: i64,
-        minute: i64,
-        hour: i64,
-    }
-    let clock_time = ClockTime {
-        second: 0,
-        minute: 0,
-        hour: 0,
-    };
-    println!(
-        "Starting time: {:02}:{:02}:{:02}",
-        clock_time.hour, clock_time.minute, clock_time.second
-    );
-    let mut input = String::new();
-    print!("> ");
-    io::stdout().flush()?;
-    io::stdin().read_line(&mut input)?;
-    let seconds_result = from_string(input);
-    match seconds_result {
-        Ok(seconds) => {
-            println!("Seconds: {}", seconds);
-        }
-        Err(e) => {
-            eprintln!(
-                "Error parsing time entry.  Should be in the format HH:MM:SS, MM:SS, or SS: {}",
-                e
-            );
-        }
-    }
+fn string_from_seconds(seconds: i64) -> String {
+    let hour = seconds / 60 / 60;
+    let padded_hour = format!("{:0>2}", hour);
+    let minute = seconds / 60 % 60;
+    let padded_minute = format!("{:0>2}", minute);
+    let second = seconds % 60;
+    let padded_second = format!("{:0>2}", second);
+    format!("{0}:{1}:{2}", padded_hour, padded_minute, padded_second).to_string()
+}
 
-    Ok(())
+fn calculate_input(seconds: i64, input_string: String) -> Option<i64> {
+    if input_string.trim().len() > 1 {
+        if input_string.trim() == "exit" || input_string.trim() == "quit" {
+            std::process::exit(0);
+        }
+        let operator = input_string.chars().next()?;
+        let space = (input_string).chars().next()?;
+        let slice: &str = if space == ' ' {
+            &input_string[2..input_string.len()]
+        } else {
+            &input_string[1..input_string.len()]
+        };
+        let mut calculated_seconds: i64 = 0;
+        let seconds_return = seconds_from_string(slice.to_string())?;
+        if operator == '+' {
+            calculated_seconds = seconds + seconds_return;
+        } else if operator == '-' {
+            calculated_seconds = seconds - seconds_return;
+        } else if operator == '*' {
+            calculated_seconds = seconds * seconds_return;
+        } else if operator == '/' {
+            calculated_seconds = seconds / seconds_return;
+        }
+        Some(calculated_seconds)
+    } else {
+        None
+    }
+}
+
+fn main() {
+    let mut seconds: i64 = 0;
+    println!("Starting time: {}", string_from_seconds(seconds));
+
+    loop {
+        let mut input = String::new();
+        print!("> ");
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut input).unwrap();
+
+        let calculated_seconds = calculate_input(seconds, input);
+        match calculated_seconds {
+            Some(s) => {
+                seconds = s;
+            }
+            None => {
+                println!("Could not calculate seconds from input");
+            }
+        };
+        println!("{}", string_from_seconds(seconds));
+    }
 }
