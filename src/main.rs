@@ -135,68 +135,38 @@ fn render_display_text(state: &mut TimeCalc) {
 
 fn add_input_character(state: &mut TimeCalc, character: String) {
     let colon_split: Vec<&str> = state.input.split(":").collect();
-    println!("colon_split.len(): {}", colon_split.len());
-    if colon_split.len() == 1 {
-        if character == ":" {
-            if colon_split[0].chars().count() == 0 {
+    let num_elements = colon_split.len();
+    if character == ":" {
+        if num_elements == 1 {
+            let num_characters = colon_split[0].chars().count();
+            if num_characters == 0 {
                 return;
             }
-            if colon_split[0].chars().count() == 1 {
-                state.input = format!("{}{}", state.input, character);
+        } else if num_elements == 2 {
+            let num_characters = colon_split[1].chars().count();
+            if num_characters == 0 {
                 return;
             }
-            if colon_split[0].chars().count() == 2 {
-                state.input = format!("{}{}", state.input, character);
-                return;
-            }
-        } else {
-            if colon_split[0].chars().count() == 0 {
-                state.input = format!("{}{}", state.input, character);
-                return;
-            }
-            if colon_split[0].chars().count() == 1 {
-                state.input = format!("{}{}", state.input, character);
-                return;
-            }
-        }
-    } else if colon_split.len() == 2 {
-        if character == ":" {
-            if colon_split[1].chars().count() == 0 {
-                return;
-            }
-            if colon_split[1].chars().count() == 1 {
-                state.input = format!("{}{}", state.input, character);
-                return;
-            }
-            if colon_split[1].chars().count() == 2 {
-                state.input = format!("{}{}", state.input, character);
-                return;
-            }
-        } else {
-            if colon_split[1].chars().count() == 0 {
-                state.input = format!("{}{}", state.input, character);
-                return;
-            }
-            if colon_split[1].chars().count() == 1 {
-                state.input = format!("{}{}", state.input, character);
-                return;
-            }
-        }
-    } else if colon_split.len() == 3 {
-        if character == ":" {
+        } else if num_elements == 3 {
             return;
-        } else {
-            if colon_split[2].chars().count() == 0 {
-                state.input = format!("{}{}", state.input, character);
-                return;
-            }
-            if colon_split[2].chars().count() == 1 {
-                state.input = format!("{}{}", state.input, character);
-                return;
-            }
+        }
+    } else if num_elements == 1 {
+        let num_characters = colon_split[0].chars().count();
+        if num_characters > 1 {
+            return;
+        }
+    } else if num_elements == 2 {
+        let num_characters = colon_split[1].chars().count();
+        if num_characters > 1 {
+            return;
+        }
+    } else if num_elements == 3 {
+        let num_characters = colon_split[2].chars().count();
+        if num_characters > 1 {
+            return;
         }
     }
-    println!("character: {}", character);
+    state.input = format!("{}{}", state.input, character);
 }
 
 impl eframe::App for TimeCalc {
