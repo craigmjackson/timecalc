@@ -133,6 +133,13 @@ fn render_display_text(state: &mut TimeCalc) {
     );
 }
 
+fn clear(state: &mut TimeCalc) {
+    state.result_string = "00:00:00".to_owned();
+    state.operator = "".to_owned();
+    state.input = "".to_owned();
+    render_display_text(state);
+}
+
 fn add_input_character(state: &mut TimeCalc, character: String) {
     let colon_split: Vec<&str> = state.input.split(":").collect();
     let num_elements = colon_split.len();
@@ -181,6 +188,7 @@ impl eframe::App for TimeCalc {
                         if *key == egui::Key::Enter {
                             println!("pressesd =");
                         } else if *key == egui::Key::Escape {
+                            clear(self);
                             println!("pressed esc");
                         }
                     }
