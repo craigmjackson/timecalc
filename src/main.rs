@@ -92,44 +92,157 @@ fn main() -> eframe::Result {
     //     println!("{}", string_from_seconds(seconds));
     // }
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_inner_size([400.0, 400.0]),
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size([159.0, 184.0])
+            .with_resizable(false),
         ..Default::default()
     };
     eframe::run_native(
         "TimeCalc",
         options,
-        Box::new(|cc| Ok(Box::<MyApp>::default())),
+        Box::new(|cc| Ok(Box::<TimeCalc>::default())),
     )
 }
 
-struct MyApp {
-    name: String,
-    age: u32,
+struct TimeCalc {
+    time_string: String,
+    seconds: u64,
 }
 
-impl Default for MyApp {
+impl Default for TimeCalc {
     fn default() -> Self {
         Self {
-            name: "Semicolon".to_owned(),
-            age: 1,
+            time_string: "00:00:00".to_owned(),
+            seconds: 0,
         }
     }
 }
 
-impl eframe::App for MyApp {
+impl eframe::App for TimeCalc {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Demo");
-            ui.horizontal(|ui| {
-                let name_label = ui.label("Name: ");
-                ui.text_edit_singleline(&mut self.name)
-                    .labelled_by(name_label.id);
-            });
-            ui.add(egui::Slider::new(&mut self.age, 0..=120).text("Age"));
-            if ui.button("Increment").clicked() {
-                self.age += 1;
-            }
-            ui.label(format!("Hello '{}', age {}", self.name, self.age));
+            ui.add_sized(
+                [144.0, 15.0],
+                egui::TextEdit::singleline(&mut self.time_string),
+            );
+            egui::Grid::new("calc_grid")
+                .striped(true)
+                .min_col_width(30.0)
+                .min_row_height(35.0)
+                .show(ui, |ui| {
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("7"))
+                        .clicked()
+                    {
+                        println!("Pressed 7");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("8"))
+                        .clicked()
+                    {
+                        println!("Pressed 8");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("9"))
+                        .clicked()
+                    {
+                        println!("Pressed 9");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("÷"))
+                        .clicked()
+                    {
+                        println!("Pressed ÷");
+                    };
+                    ui.end_row();
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("4"))
+                        .clicked()
+                    {
+                        println!("Pressed 4");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("5"))
+                        .clicked()
+                    {
+                        println!("Pressed 5");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("6"))
+                        .clicked()
+                    {
+                        println!("Pressed 6");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("x"))
+                        .clicked()
+                    {
+                        println!("Pressed x");
+                    };
+                    ui.end_row();
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("1"))
+                        .clicked()
+                    {
+                        println!("Pressed 1");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("2"))
+                        .clicked()
+                    {
+                        println!("Pressed 2");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("3"))
+                        .clicked()
+                    {
+                        println!("Pressed 3");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("-"))
+                        .clicked()
+                    {
+                        println!("pressed -");
+                    };
+                    ui.end_row();
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("0"))
+                        .clicked()
+                    {
+                        println!("pressed 0");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new(":"))
+                        .clicked()
+                    {
+                        println!("pressed :");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("="))
+                        .clicked()
+                    {
+                        println!("pressed =");
+                    };
+                    if ui
+                        .add_sized([ui.available_width(), 30.0], egui::Button::new("+"))
+                        .clicked()
+                    {
+                        println!("pressed +");
+                    };
+                });
+            // ui.horizontal(|ui| {
+            //     let time_string_label = ui.label("Time String: ");
+            //     ui.text_edit_singleline(&mut self.time_string)
+            //         .labelled_by(time_string_label.id);
+            // });
+            // ui.add(egui::Slider::new(&mut self.seconds, 0..=120).text("Time String"));
+            // if ui.button("Increment").clicked() {
+            //     self.seconds += 1;
+            // }
+            // ui.label(format!(
+            //     "Time String '{}', seconds {}",
+            //     self.time_string, self.seconds
+            // ));
         });
     }
 }
