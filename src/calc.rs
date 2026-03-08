@@ -1,0 +1,68 @@
+pub fn parse_int(time_string: &str) -> Option<i64> {
+    match time_string.trim().parse::<i64>() {
+        Ok(integer) => Some(integer),
+        Err(_) => {
+            println!("Could not parse string {}", time_string);
+            None
+        }
+    }
+}
+
+pub fn seconds_from_string(time_string: String) -> Option<i64> {
+    let colon_split: Vec<&str> = time_string.split(":").collect();
+    if colon_split.len() == 3 {
+        let hour: i64 = parse_int(colon_split[0])?;
+        let minute: i64 = parse_int(colon_split[1])? + (hour * 60);
+        let second: i64 = parse_int(colon_split[2])? + (minute * 60);
+        Some(second)
+    } else if colon_split.len() == 2 {
+        let minute: i64 = parse_int(colon_split[0])?;
+        let second: i64 = parse_int(colon_split[1])? + (minute * 60);
+        Some(second)
+    } else if colon_split.len() == 1 {
+        let second: i64 = parse_int(colon_split[0])?;
+        Some(second)
+    } else {
+        println!("Cannot parse seconds from string {}", time_string);
+        None
+    }
+}
+
+pub fn string_from_seconds(seconds: i64) -> String {
+    let hour = seconds / 60 / 60;
+    let padded_hour = format!("{:0>2}", hour);
+    let minute = seconds / 60 % 60;
+    let padded_minute = format!("{:0>2}", minute);
+    let second = seconds % 60;
+    let padded_second = format!("{:0>2}", second);
+    format!("{0}:{1}:{2}", padded_hour, padded_minute, padded_second).to_string()
+}
+
+pub fn calculate_input(seconds: i64, input_string: String) -> Option<i64> {
+    if input_string.trim().len() > 1 {
+        if input_string.trim() == "exit" || input_string.trim() == "quit" {
+            std::process::exit(0);
+        }
+        let operator = input_string.chars().next()?;
+        let space = (input_string).chars().next()?;
+        let slice: &str = if space == ' ' {
+            &input_string[2..input_string.len()]
+        } else {
+            &input_string[1..input_string.len()]
+        };
+        let mut calculated_seconds: i64 = 0;
+        let seconds_return = seconds_from_string(slice.to_string())?;
+        if operator == '+' {
+            calculated_seconds = seconds + seconds_return;
+        } else if operator == '-' {
+            calculated_seconds = seconds - seconds_return;
+        } else if operator == '*' {
+            calculated_seconds = seconds * seconds_return;
+        } else if operator == '/' {
+            calculated_seconds = seconds / seconds_return;
+        }
+        Some(calculated_seconds)
+    } else {
+        None
+    }
+}

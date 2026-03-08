@@ -10,3 +10,13 @@ cli = []
 
 [dependencies]
 eframe = { version = "0.33.3", optional = true }
+
+[[bin]]
+name = "timecalc-cli"
+path = "src/bin/cli.rs"
+required-features = ["cli"]
+
+[[bin]]
+name = "timecalc-gui"
+path = "src/bin/gui.rs"
+required-features = ["gui"]

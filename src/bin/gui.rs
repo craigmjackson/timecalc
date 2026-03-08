@@ -1,127 +1,30 @@
-#[cfg(feature = "gui")]
 use eframe::egui;
-
-#[cfg(feature = "cli")]
-use std::io::Write;
-
-fn parse_int(time_string: &str) -> Option<i64> {
-    match time_string.trim().parse::<i64>() {
-        Ok(integer) => Some(integer),
-        Err(_) => {
-            println!("Could not parse string {}", time_string);
-            None
-        }
-    }
-}
-
-fn seconds_from_string(time_string: String) -> Option<i64> {
-    let colon_split: Vec<&str> = time_string.split(":").collect();
-    if colon_split.len() == 3 {
-        let hour: i64 = parse_int(colon_split[0])?;
-        let minute: i64 = parse_int(colon_split[1])? + (hour * 60);
-        let second: i64 = parse_int(colon_split[2])? + (minute * 60);
-        Some(second)
-    } else if colon_split.len() == 2 {
-        let minute: i64 = parse_int(colon_split[0])?;
-        let second: i64 = parse_int(colon_split[1])? + (minute * 60);
-        Some(second)
-    } else if colon_split.len() == 1 {
-        let second: i64 = parse_int(colon_split[0])?;
-        Some(second)
-    } else {
-        println!("Cannot parse seconds from string {}", time_string);
-        None
-    }
-}
-
-fn string_from_seconds(seconds: i64) -> String {
-    let hour = seconds / 60 / 60;
-    let padded_hour = format!("{:0>2}", hour);
-    let minute = seconds / 60 % 60;
-    let padded_minute = format!("{:0>2}", minute);
-    let second = seconds % 60;
-    let padded_second = format!("{:0>2}", second);
-    format!("{0}:{1}:{2}", padded_hour, padded_minute, padded_second).to_string()
-}
-
-fn calculate_input(seconds: i64, input_string: String) -> Option<i64> {
-    if input_string.trim().len() > 1 {
-        if input_string.trim() == "exit" || input_string.trim() == "quit" {
-            std::process::exit(0);
-        }
-        let operator = input_string.chars().next()?;
-        let space = (input_string).chars().next()?;
-        let slice: &str = if space == ' ' {
-            &input_string[2..input_string.len()]
-        } else {
-            &input_string[1..input_string.len()]
-        };
-        let mut calculated_seconds: i64 = 0;
-        let seconds_return = seconds_from_string(slice.to_string())?;
-        if operator == '+' {
-            calculated_seconds = seconds + seconds_return;
-        } else if operator == '-' {
-            calculated_seconds = seconds - seconds_return;
-        } else if operator == '*' {
-            calculated_seconds = seconds * seconds_return;
-        } else if operator == '/' {
-            calculated_seconds = seconds / seconds_return;
-        }
-        Some(calculated_seconds)
-    } else {
-        None
-    }
-}
+use timecalc::calc::calculate_input;
+use timecalc::calc::seconds_from_string;
+use timecalc::calc::string_from_seconds;
 
 fn main() {
-    #[cfg(feature = "gui")]
-    {
-        let options = eframe::NativeOptions {
-            viewport: egui::ViewportBuilder::default()
-                .with_inner_size([159.0, 230.0])
-                .with_resizable(false),
-            ..Default::default()
-        };
-        let eframe_result = eframe::run_native(
-            "TimeCalc",
-            options,
-            Box::new(|_cc| Ok(Box::<TimeCalc>::default())),
-        );
-        match eframe_result {
-            Ok(_) => {
-                println!();
-            }
-            Err(e) => {
-                println!("{}", e);
-            }
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size([159.0, 230.0])
+            .with_resizable(false),
+        ..Default::default()
+    };
+    let eframe_result = eframe::run_native(
+        "TimeCalc",
+        options,
+        Box::new(|_cc| Ok(Box::<TimeCalc>::default())),
+    );
+    match eframe_result {
+        Ok(_) => {
+            println!();
         }
-    }
-
-    #[cfg(feature = "cli")]
-    {
-        let mut seconds: i64 = 0;
-        println!("Starting time: {}", string_from_seconds(seconds));
-        loop {
-            let mut input = String::new();
-            print!("> ");
-            std::io::stdout().flush().unwrap();
-            std::io::stdin().read_line(&mut input).unwrap();
-
-            let calculated_seconds = calculate_input(seconds, input);
-            match calculated_seconds {
-                Some(s) => {
-                    seconds = s;
-                }
-                None => {
-                    println!("Could not calculate seconds from input");
-                }
-            };
-            println!("{}", string_from_seconds(seconds));
+        Err(e) => {
+            println!("{}", e);
         }
     }
 }
 
-#[cfg(feature = "gui")]
 struct TimeCalc {
     display_text: String,
     result_string: String,
@@ -131,7 +34,6 @@ struct TimeCalc {
     exiting: bool,
 }
 
-#[cfg(feature = "gui")]
 impl Default for TimeCalc {
     fn default() -> Self {
         Self {
@@ -145,7 +47,6 @@ impl Default for TimeCalc {
     }
 }
 
-#[cfg(feature = "gui")]
 fn render_display_text(state: &mut TimeCalc) {
     state.display_text = format!(
         "{}\n{} {}",
@@ -153,7 +54,6 @@ fn render_display_text(state: &mut TimeCalc) {
     );
 }
 
-#[cfg(feature = "gui")]
 fn clear(state: &mut TimeCalc) {
     state.result_string = "00:00:00".to_owned();
     state.operator = "".to_owned();
@@ -161,7 +61,6 @@ fn clear(state: &mut TimeCalc) {
     render_display_text(state);
 }
 
-#[cfg(feature = "gui")]
 fn add_input_character(state: &mut TimeCalc, character: String) {
     let colon_split: Vec<&str> = state.input.split(":").collect();
     let num_elements = colon_split.len();
@@ -198,7 +97,6 @@ fn add_input_character(state: &mut TimeCalc, character: String) {
     state.input = format!("{}{}", state.input, character);
 }
 
-#[cfg(feature = "gui")]
 fn calculate_from_gui_input(state: &mut TimeCalc) {
     let new_input = state.input.clone();
     if state.operator.is_empty() {
@@ -237,7 +135,6 @@ fn calculate_from_gui_input(state: &mut TimeCalc) {
     };
 }
 
-#[cfg(feature = "gui")]
 impl eframe::App for TimeCalc {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         if ctx.input(|i| i.viewport().close_requested()) {
