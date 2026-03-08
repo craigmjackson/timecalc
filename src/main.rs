@@ -1,3 +1,4 @@
+use eframe::egui;
 use std::io::{self, Write};
 
 fn parse_int(time_string: &str) -> Option<i64> {
@@ -69,25 +70,66 @@ fn calculate_input(seconds: i64, input_string: String) -> Option<i64> {
     }
 }
 
-fn main() {
-    let mut seconds: i64 = 0;
-    println!("Starting time: {}", string_from_seconds(seconds));
+fn main() -> eframe::Result {
+    // let mut seconds: i64 = 0;
+    // println!("Starting time: {}", string_from_seconds(seconds));
+    //
+    // loop {
+    //     let mut input = String::new();
+    //     print!("> ");
+    //     io::stdout().flush().unwrap();
+    //     io::stdin().read_line(&mut input).unwrap();
+    //
+    //     let calculated_seconds = calculate_input(seconds, input);
+    //     match calculated_seconds {
+    //         Some(s) => {
+    //             seconds = s;
+    //         }
+    //         None => {
+    //             println!("Could not calculate seconds from input");
+    //         }
+    //     };
+    //     println!("{}", string_from_seconds(seconds));
+    // }
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default().with_inner_size([400.0, 400.0]),
+        ..Default::default()
+    };
+    eframe::run_native(
+        "TimeCalc",
+        options,
+        Box::new(|cc| Ok(Box::<MyApp>::default())),
+    )
+}
 
-    loop {
-        let mut input = String::new();
-        print!("> ");
-        io::stdout().flush().unwrap();
-        io::stdin().read_line(&mut input).unwrap();
+struct MyApp {
+    name: String,
+    age: u32,
+}
 
-        let calculated_seconds = calculate_input(seconds, input);
-        match calculated_seconds {
-            Some(s) => {
-                seconds = s;
+impl Default for MyApp {
+    fn default() -> Self {
+        Self {
+            name: "Semicolon".to_owned(),
+            age: 1,
+        }
+    }
+}
+
+impl eframe::App for MyApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            ui.heading("Demo");
+            ui.horizontal(|ui| {
+                let name_label = ui.label("Name: ");
+                ui.text_edit_singleline(&mut self.name)
+                    .labelled_by(name_label.id);
+            });
+            ui.add(egui::Slider::new(&mut self.age, 0..=120).text("Age"));
+            if ui.button("Increment").clicked() {
+                self.age += 1;
             }
-            None => {
-                println!("Could not calculate seconds from input");
-            }
-        };
-        println!("{}", string_from_seconds(seconds));
+            ui.label(format!("Hello '{}', age {}", self.name, self.age));
+        });
     }
 }
