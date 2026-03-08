@@ -121,6 +121,45 @@ impl Default for TimeCalc {
 impl eframe::App for TimeCalc {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
+            ui.input(|i| {
+                for event in &i.events {
+                    if let egui::Event::Text(text) = event {
+                        if text == "7" {
+                            println!("pressed 7");
+                        } else if text == "8" {
+                            println!("pressed 8");
+                        } else if text == "9" {
+                            println!("pressed 9");
+                        } else if text == "/" {
+                            println!("pressed ÷");
+                        } else if text == "4" {
+                            println!("pressed 4");
+                        } else if text == "5" {
+                            println!("pressed 5");
+                        } else if text == "6" {
+                            println!("pressed 6");
+                        } else if text == "x" || text == "*" {
+                            println!("pressed *");
+                        } else if text == "1" {
+                            println!("pressed 1");
+                        } else if text == "2" {
+                            println!("pressed 2");
+                        } else if text == "3" {
+                            println!("pressed 3");
+                        } else if text == "-" {
+                            println!("pressed -");
+                        } else if text == "0" {
+                            println!("pressed 0");
+                        } else if text == ":" || text == "." {
+                            println!("pressed :");
+                        } else if text == "=" {
+                            println!("pressed =");
+                        } else if text == "+" {
+                            println!("pressed +");
+                        }
+                    }
+                }
+            });
             ui.add_sized(
                 [144.0, 15.0],
                 egui::TextEdit::singleline(&mut self.time_string),
@@ -230,19 +269,6 @@ impl eframe::App for TimeCalc {
                         println!("pressed +");
                     };
                 });
-            // ui.horizontal(|ui| {
-            //     let time_string_label = ui.label("Time String: ");
-            //     ui.text_edit_singleline(&mut self.time_string)
-            //         .labelled_by(time_string_label.id);
-            // });
-            // ui.add(egui::Slider::new(&mut self.seconds, 0..=120).text("Time String"));
-            // if ui.button("Increment").clicked() {
-            //     self.seconds += 1;
-            // }
-            // ui.label(format!(
-            //     "Time String '{}', seconds {}",
-            //     self.time_string, self.seconds
-            // ));
         });
     }
 }
