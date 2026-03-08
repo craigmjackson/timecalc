@@ -1,3 +1,4 @@
+#[cfg(feature = "gui")]
 use eframe::egui;
 use std::io::{self, Write};
 
@@ -70,6 +71,7 @@ fn calculate_input(seconds: i64, input_string: String) -> Option<i64> {
     }
 }
 
+#[cfg(feature = "gui")]
 fn main() -> eframe::Result {
     // let mut seconds: i64 = 0;
     // println!("Starting time: {}", string_from_seconds(seconds));
@@ -100,19 +102,44 @@ fn main() -> eframe::Result {
     eframe::run_native(
         "TimeCalc",
         options,
-        Box::new(|cc| Ok(Box::<TimeCalc>::default())),
+        Box::new(|_cc| Ok(Box::<TimeCalc>::default())),
     )
 }
 
+#[cfg(feature = "cli")]
+fn main() {
+    let mut seconds: i64 = 0;
+    println!("Starting time: {}", string_from_seconds(seconds));
+
+    loop {
+        let mut input = String::new();
+        print!("> ");
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut input).unwrap();
+
+        let calculated_seconds = calculate_input(seconds, input);
+        match calculated_seconds {
+            Some(s) => {
+                seconds = s;
+            }
+            None => {
+                println!("Could not calculate seconds from input");
+            }
+        };
+        println!("{}", string_from_seconds(seconds));
+    }
+}
+
+#[cfg(feature = "gui")]
 struct TimeCalc {
     display_text: String,
     result_string: String,
     seconds: i64,
     operator: String,
     input: String,
-    operand: i64,
 }
 
+#[cfg(feature = "gui")]
 impl Default for TimeCalc {
     fn default() -> Self {
         Self {
@@ -121,11 +148,11 @@ impl Default for TimeCalc {
             seconds: 0,
             operator: "".to_owned(),
             input: "".to_owned(),
-            operand: 0,
         }
     }
 }
 
+#[cfg(feature = "gui")]
 fn render_display_text(state: &mut TimeCalc) {
     state.display_text = format!(
         "{}\n{} {}",
@@ -133,6 +160,7 @@ fn render_display_text(state: &mut TimeCalc) {
     );
 }
 
+#[cfg(feature = "gui")]
 fn clear(state: &mut TimeCalc) {
     state.result_string = "00:00:00".to_owned();
     state.operator = "".to_owned();
@@ -140,6 +168,7 @@ fn clear(state: &mut TimeCalc) {
     render_display_text(state);
 }
 
+#[cfg(feature = "gui")]
 fn add_input_character(state: &mut TimeCalc, character: String) {
     let colon_split: Vec<&str> = state.input.split(":").collect();
     let num_elements = colon_split.len();
@@ -176,6 +205,7 @@ fn add_input_character(state: &mut TimeCalc, character: String) {
     state.input = format!("{}{}", state.input, character);
 }
 
+#[cfg(feature = "gui")]
 fn calculate_from_gui_input(state: &mut TimeCalc) {
     let new_input = state.input.clone();
     if state.operator.is_empty() {
@@ -214,6 +244,7 @@ fn calculate_from_gui_input(state: &mut TimeCalc) {
     };
 }
 
+#[cfg(feature = "gui")]
 impl eframe::App for TimeCalc {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {

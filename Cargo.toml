@@ -3,5 +3,10 @@ name = "timecalc"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["gui"]
+gui = ["dep:eframe"]
+cli = []
+
 [dependencies]
-eframe = "0.33.3"
+eframe = { version = "0.33.3", optional = true }
