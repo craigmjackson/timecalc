@@ -107,10 +107,10 @@ fn main() -> eframe::Result {
 struct TimeCalc {
     display_text: String,
     result_string: String,
-    seconds: u64,
+    seconds: i64,
     operator: String,
     input: String,
-    operand: u64,
+    operand: i64,
 }
 
 impl Default for TimeCalc {
@@ -176,6 +176,30 @@ fn add_input_character(state: &mut TimeCalc, character: String) {
     state.input = format!("{}{}", state.input, character);
 }
 
+fn calculate_from_gui_input(state: &mut TimeCalc) {
+    let new_input = state.input.clone();
+    if state.operator.is_empty() {
+        state.result_string = new_input;
+        state.input = "".to_owned();
+        render_display_text(state);
+        return;
+    }
+    let input_with_operator = format!("{} {}", state.operator, new_input);
+    let calculated_seconds = calculate_input(state.seconds, input_with_operator);
+    match calculated_seconds {
+        Some(s) => {
+            state.seconds = s;
+            state.result_string = string_from_seconds(state.seconds);
+            state.input = "".to_owned();
+            state.operator = "".to_owned();
+            render_display_text(state);
+        }
+        None => {
+            println!("Could not calculate seconds from input");
+        }
+    };
+}
+
 impl eframe::App for TimeCalc {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -186,6 +210,7 @@ impl eframe::App for TimeCalc {
                     } = event
                     {
                         if *key == egui::Key::Enter {
+                            calculate_from_gui_input(self);
                             println!("pressesd =");
                         } else if *key == egui::Key::Escape {
                             clear(self);
