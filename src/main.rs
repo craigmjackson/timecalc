@@ -1,6 +1,8 @@
 #[cfg(feature = "gui")]
 use eframe::egui;
-use std::io::{self, Write};
+
+#[cfg(feature = "cli")]
+use std::io::Write;
 
 fn parse_int(time_string: &str) -> Option<i64> {
     match time_string.trim().parse::<i64>() {
@@ -71,62 +73,51 @@ fn calculate_input(seconds: i64, input_string: String) -> Option<i64> {
     }
 }
 
-#[cfg(feature = "gui")]
-fn main() -> eframe::Result {
-    // let mut seconds: i64 = 0;
-    // println!("Starting time: {}", string_from_seconds(seconds));
-    //
-    // loop {
-    //     let mut input = String::new();
-    //     print!("> ");
-    //     io::stdout().flush().unwrap();
-    //     io::stdin().read_line(&mut input).unwrap();
-    //
-    //     let calculated_seconds = calculate_input(seconds, input);
-    //     match calculated_seconds {
-    //         Some(s) => {
-    //             seconds = s;
-    //         }
-    //         None => {
-    //             println!("Could not calculate seconds from input");
-    //         }
-    //     };
-    //     println!("{}", string_from_seconds(seconds));
-    // }
-    let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([159.0, 230.0])
-            .with_resizable(false),
-        ..Default::default()
-    };
-    eframe::run_native(
-        "TimeCalc",
-        options,
-        Box::new(|_cc| Ok(Box::<TimeCalc>::default())),
-    )
-}
-
-#[cfg(feature = "cli")]
 fn main() {
-    let mut seconds: i64 = 0;
-    println!("Starting time: {}", string_from_seconds(seconds));
-
-    loop {
-        let mut input = String::new();
-        print!("> ");
-        io::stdout().flush().unwrap();
-        io::stdin().read_line(&mut input).unwrap();
-
-        let calculated_seconds = calculate_input(seconds, input);
-        match calculated_seconds {
-            Some(s) => {
-                seconds = s;
-            }
-            None => {
-                println!("Could not calculate seconds from input");
-            }
+    #[cfg(feature = "gui")]
+    {
+        let options = eframe::NativeOptions {
+            viewport: egui::ViewportBuilder::default()
+                .with_inner_size([159.0, 230.0])
+                .with_resizable(false),
+            ..Default::default()
         };
-        println!("{}", string_from_seconds(seconds));
+        let eframe_result = eframe::run_native(
+            "TimeCalc",
+            options,
+            Box::new(|_cc| Ok(Box::<TimeCalc>::default())),
+        );
+        match eframe_result {
+            Ok(_) => {
+                println!();
+            }
+            Err(e) => {
+                println!("{}", e);
+            }
+        }
+    }
+
+    #[cfg(feature = "cli")]
+    {
+        let mut seconds: i64 = 0;
+        println!("Starting time: {}", string_from_seconds(seconds));
+        loop {
+            let mut input = String::new();
+            print!("> ");
+            std::io::stdout().flush().unwrap();
+            std::io::stdin().read_line(&mut input).unwrap();
+
+            let calculated_seconds = calculate_input(seconds, input);
+            match calculated_seconds {
+                Some(s) => {
+                    seconds = s;
+                }
+                None => {
+                    println!("Could not calculate seconds from input");
+                }
+            };
+            println!("{}", string_from_seconds(seconds));
+        }
     }
 }
 
@@ -137,6 +128,7 @@ struct TimeCalc {
     seconds: i64,
     operator: String,
     input: String,
+    exiting: bool,
 }
 
 #[cfg(feature = "gui")]
@@ -148,6 +140,7 @@ impl Default for TimeCalc {
             seconds: 0,
             operator: "".to_owned(),
             input: "".to_owned(),
+            exiting: false,
         }
     }
 }
@@ -247,6 +240,9 @@ fn calculate_from_gui_input(state: &mut TimeCalc) {
 #[cfg(feature = "gui")]
 impl eframe::App for TimeCalc {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        if ctx.input(|i| i.viewport().close_requested()) {
+            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+        }
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.input(|i| {
                 for event in &i.events {
@@ -258,6 +254,8 @@ impl eframe::App for TimeCalc {
                             calculate_from_gui_input(self);
                         } else if *key == egui::Key::Escape {
                             clear(self);
+                        } else if *key == egui::Key::Q && i.modifiers.command {
+                            self.exiting = true;
                         }
                     }
                     if let egui::Event::Text(text) = event {
@@ -310,6 +308,9 @@ impl eframe::App for TimeCalc {
                     }
                 }
             });
+            if self.exiting {
+                ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
+            }
             let row_height = ui.text_style_height(&egui::TextStyle::Body);
             let total_height = row_height * 1.5 + ui.spacing().item_spacing.y;
             ui.add_sized(
