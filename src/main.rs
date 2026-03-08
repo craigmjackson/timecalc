@@ -179,10 +179,24 @@ fn add_input_character(state: &mut TimeCalc, character: String) {
 fn calculate_from_gui_input(state: &mut TimeCalc) {
     let new_input = state.input.clone();
     if state.operator.is_empty() {
-        state.result_string = new_input;
-        state.input = "".to_owned();
-        render_display_text(state);
-        return;
+        let calculated_seconds = seconds_from_string(new_input);
+        match calculated_seconds {
+            Some(s) => {
+                state.seconds = s;
+                state.result_string = string_from_seconds(state.seconds);
+                state.input = "".to_owned();
+                state.operator = "".to_owned();
+                render_display_text(state);
+                return;
+            }
+            None => {
+                println!("Could not calculate seconds from input");
+                return;
+            }
+        }
+    }
+    if state.operator == "÷" {
+        state.operator = "/".to_owned();
     }
     let input_with_operator = format!("{} {}", state.operator, new_input);
     let calculated_seconds = calculate_input(state.seconds, input_with_operator);
@@ -211,75 +225,56 @@ impl eframe::App for TimeCalc {
                     {
                         if *key == egui::Key::Enter {
                             calculate_from_gui_input(self);
-                            println!("pressesd =");
                         } else if *key == egui::Key::Escape {
                             clear(self);
-                            println!("pressed esc");
                         }
                     }
                     if let egui::Event::Text(text) = event {
                         if text == "7" {
                             add_input_character(self, "7".to_owned());
                             render_display_text(self);
-                            println!("pressed 7");
                         } else if text == "8" {
                             add_input_character(self, "8".to_owned());
                             render_display_text(self);
-                            println!("pressed 8");
                         } else if text == "9" {
                             add_input_character(self, "9".to_owned());
                             render_display_text(self);
-                            println!("pressed 9");
                         } else if text == "/" {
                             self.operator = "÷".to_owned();
                             render_display_text(self);
-                            println!("pressed ÷");
                         } else if text == "4" {
                             add_input_character(self, "4".to_owned());
                             render_display_text(self);
-                            println!("pressed 4");
                         } else if text == "5" {
                             add_input_character(self, "5".to_owned());
                             render_display_text(self);
-                            println!("pressed 5");
                         } else if text == "6" {
                             add_input_character(self, "6".to_owned());
                             render_display_text(self);
-                            println!("pressed 6");
                         } else if text == "x" || text == "*" {
                             self.operator = "x".to_owned();
                             render_display_text(self);
-                            println!("pressed *");
                         } else if text == "1" {
                             add_input_character(self, "1".to_owned());
                             render_display_text(self);
-                            println!("pressed 1");
                         } else if text == "2" {
                             add_input_character(self, "2".to_owned());
                             render_display_text(self);
-                            println!("pressed 2");
                         } else if text == "3" {
                             add_input_character(self, "3".to_owned());
                             render_display_text(self);
-                            println!("pressed 3");
                         } else if text == "-" {
                             self.operator = "-".to_owned();
                             render_display_text(self);
-                            println!("pressed -");
                         } else if text == "0" {
                             add_input_character(self, "0".to_owned());
                             render_display_text(self);
-                            println!("pressed 0");
                         } else if text == ":" || text == "." {
                             add_input_character(self, ":".to_owned());
                             render_display_text(self);
-                            println!("pressed :");
-                        } else if text == "=" || text == "\n" {
-                            println!("pressed =");
                         } else if text == "+" {
                             self.operator = "+".to_owned();
                             render_display_text(self);
-                            println!("pressed +");
                         }
                     }
                 }
@@ -302,100 +297,115 @@ impl eframe::App for TimeCalc {
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("7"))
                         .clicked()
                     {
-                        println!("Pressed 7");
+                        add_input_character(self, "7".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("8"))
                         .clicked()
                     {
-                        println!("Pressed 8");
+                        add_input_character(self, "8".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("9"))
                         .clicked()
                     {
-                        println!("Pressed 9");
+                        add_input_character(self, "9".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("÷"))
                         .clicked()
                     {
-                        println!("Pressed ÷");
+                        self.operator = "÷".to_owned();
+                        render_display_text(self);
                     };
                     ui.end_row();
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("4"))
                         .clicked()
                     {
-                        println!("Pressed 4");
+                        add_input_character(self, "4".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("5"))
                         .clicked()
                     {
-                        println!("Pressed 5");
+                        add_input_character(self, "5".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("6"))
                         .clicked()
                     {
-                        println!("Pressed 6");
+                        add_input_character(self, "6".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("x"))
                         .clicked()
                     {
-                        println!("Pressed x");
+                        self.operator = "x".to_owned();
+                        render_display_text(self);
                     };
                     ui.end_row();
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("1"))
                         .clicked()
                     {
-                        println!("Pressed 1");
+                        add_input_character(self, "1".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("2"))
                         .clicked()
                     {
-                        println!("Pressed 2");
+                        add_input_character(self, "2".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("3"))
                         .clicked()
                     {
-                        println!("Pressed 3");
+                        add_input_character(self, "3".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("-"))
                         .clicked()
                     {
-                        println!("pressed -");
+                        self.operator = "-".to_owned();
+                        render_display_text(self);
                     };
                     ui.end_row();
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("0"))
                         .clicked()
                     {
-                        println!("pressed 0");
+                        add_input_character(self, "0".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new(":"))
                         .clicked()
                     {
-                        println!("pressed :");
+                        add_input_character(self, ":".to_owned());
+                        render_display_text(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("="))
                         .clicked()
                     {
-                        println!("pressed =");
+                        calculate_from_gui_input(self);
                     };
                     if ui
                         .add_sized([ui.available_width(), 30.0], egui::Button::new("+"))
                         .clicked()
                     {
-                        println!("pressed +");
+                        self.operator = "+".to_owned();
+                        render_display_text(self);
                     };
                 });
         });
