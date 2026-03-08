@@ -93,7 +93,7 @@ fn main() -> eframe::Result {
     // }
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([159.0, 184.0])
+            .with_inner_size([159.0, 200.0])
             .with_resizable(false),
         ..Default::default()
     };
@@ -133,47 +133,145 @@ fn render_display_text(state: &mut TimeCalc) {
     );
 }
 
+fn add_input_character(state: &mut TimeCalc, character: String) {
+    let colon_split: Vec<&str> = state.input.split(":").collect();
+    println!("colon_split.len(): {}", colon_split.len());
+    if colon_split.len() == 1 {
+        if character == ":" {
+            if colon_split[0].chars().count() == 0 {
+                return;
+            }
+            if colon_split[0].chars().count() == 1 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+            if colon_split[0].chars().count() == 2 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+        } else {
+            if colon_split[0].chars().count() == 0 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+            if colon_split[0].chars().count() == 1 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+        }
+    } else if colon_split.len() == 2 {
+        if character == ":" {
+            if colon_split[1].chars().count() == 0 {
+                return;
+            }
+            if colon_split[1].chars().count() == 1 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+            if colon_split[1].chars().count() == 2 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+        } else {
+            if colon_split[1].chars().count() == 0 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+            if colon_split[1].chars().count() == 1 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+        }
+    } else if colon_split.len() == 3 {
+        if character == ":" {
+            return;
+        } else {
+            if colon_split[2].chars().count() == 0 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+            if colon_split[2].chars().count() == 1 {
+                state.input = format!("{}{}", state.input, character);
+                return;
+            }
+        }
+    }
+    println!("character: {}", character);
+}
+
 impl eframe::App for TimeCalc {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.input(|i| {
                 for event in &i.events {
+                    if let egui::Event::Key {
+                        key, pressed: true, ..
+                    } = event
+                    {
+                        if *key == egui::Key::Enter {
+                            println!("pressesd =");
+                        } else if *key == egui::Key::Escape {
+                            println!("pressed esc");
+                        }
+                    }
                     if let egui::Event::Text(text) = event {
                         if text == "7" {
+                            add_input_character(self, "7".to_owned());
+                            render_display_text(self);
                             println!("pressed 7");
                         } else if text == "8" {
+                            add_input_character(self, "8".to_owned());
+                            render_display_text(self);
                             println!("pressed 8");
                         } else if text == "9" {
+                            add_input_character(self, "9".to_owned());
+                            render_display_text(self);
                             println!("pressed 9");
                         } else if text == "/" {
                             self.operator = "÷".to_owned();
                             render_display_text(self);
                             println!("pressed ÷");
                         } else if text == "4" {
+                            add_input_character(self, "4".to_owned());
+                            render_display_text(self);
                             println!("pressed 4");
                         } else if text == "5" {
+                            add_input_character(self, "5".to_owned());
+                            render_display_text(self);
                             println!("pressed 5");
                         } else if text == "6" {
+                            add_input_character(self, "6".to_owned());
+                            render_display_text(self);
                             println!("pressed 6");
                         } else if text == "x" || text == "*" {
                             self.operator = "x".to_owned();
                             render_display_text(self);
                             println!("pressed *");
                         } else if text == "1" {
+                            add_input_character(self, "1".to_owned());
+                            render_display_text(self);
                             println!("pressed 1");
                         } else if text == "2" {
+                            add_input_character(self, "2".to_owned());
+                            render_display_text(self);
                             println!("pressed 2");
                         } else if text == "3" {
+                            add_input_character(self, "3".to_owned());
+                            render_display_text(self);
                             println!("pressed 3");
                         } else if text == "-" {
                             self.operator = "-".to_owned();
                             render_display_text(self);
                             println!("pressed -");
                         } else if text == "0" {
+                            add_input_character(self, "0".to_owned());
+                            render_display_text(self);
                             println!("pressed 0");
                         } else if text == ":" || text == "." {
+                            add_input_character(self, ":".to_owned());
+                            render_display_text(self);
                             println!("pressed :");
-                        } else if text == "=" {
+                        } else if text == "=" || text == "\n" {
                             println!("pressed =");
                         } else if text == "+" {
                             self.operator = "+".to_owned();
