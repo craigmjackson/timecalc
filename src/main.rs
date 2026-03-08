@@ -105,17 +105,32 @@ fn main() -> eframe::Result {
 }
 
 struct TimeCalc {
-    time_string: String,
+    display_text: String,
+    result_string: String,
     seconds: u64,
+    operator: String,
+    input: String,
+    operand: u64,
 }
 
 impl Default for TimeCalc {
     fn default() -> Self {
         Self {
-            time_string: "00:00:00".to_owned(),
+            display_text: "00:00:00".to_owned(),
+            result_string: "00:00:00".to_owned(),
             seconds: 0,
+            operator: "".to_owned(),
+            input: "".to_owned(),
+            operand: 0,
         }
     }
+}
+
+fn render_display_text(state: &mut TimeCalc) {
+    state.display_text = format!(
+        "{}\n{} {}",
+        state.result_string, state.operator, state.input
+    );
 }
 
 impl eframe::App for TimeCalc {
@@ -131,6 +146,8 @@ impl eframe::App for TimeCalc {
                         } else if text == "9" {
                             println!("pressed 9");
                         } else if text == "/" {
+                            self.operator = "÷".to_owned();
+                            render_display_text(self);
                             println!("pressed ÷");
                         } else if text == "4" {
                             println!("pressed 4");
@@ -139,6 +156,8 @@ impl eframe::App for TimeCalc {
                         } else if text == "6" {
                             println!("pressed 6");
                         } else if text == "x" || text == "*" {
+                            self.operator = "x".to_owned();
+                            render_display_text(self);
                             println!("pressed *");
                         } else if text == "1" {
                             println!("pressed 1");
@@ -147,6 +166,8 @@ impl eframe::App for TimeCalc {
                         } else if text == "3" {
                             println!("pressed 3");
                         } else if text == "-" {
+                            self.operator = "-".to_owned();
+                            render_display_text(self);
                             println!("pressed -");
                         } else if text == "0" {
                             println!("pressed 0");
@@ -155,14 +176,21 @@ impl eframe::App for TimeCalc {
                         } else if text == "=" {
                             println!("pressed =");
                         } else if text == "+" {
+                            self.operator = "+".to_owned();
+                            render_display_text(self);
                             println!("pressed +");
                         }
                     }
                 }
             });
+            let row_height = ui.text_style_height(&egui::TextStyle::Body);
+            let total_height = row_height * 2.0 + ui.spacing().item_spacing.y;
             ui.add_sized(
-                [144.0, 15.0],
-                egui::TextEdit::singleline(&mut self.time_string),
+                [144.0, total_height],
+                egui::TextEdit::multiline(&mut self.display_text)
+                    .desired_rows(2)
+                    .font(egui::TextStyle::Monospace)
+                    .interactive(false),
             );
             egui::Grid::new("calc_grid")
                 .striped(true)
