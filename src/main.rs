@@ -93,7 +93,7 @@ fn main() -> eframe::Result {
     // }
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([159.0, 200.0])
+            .with_inner_size([159.0, 230.0])
             .with_resizable(false),
         ..Default::default()
     };
@@ -280,7 +280,7 @@ impl eframe::App for TimeCalc {
                 }
             });
             let row_height = ui.text_style_height(&egui::TextStyle::Body);
-            let total_height = row_height * 2.0 + ui.spacing().item_spacing.y;
+            let total_height = row_height * 1.5 + ui.spacing().item_spacing.y;
             ui.add_sized(
                 [144.0, total_height],
                 egui::TextEdit::multiline(&mut self.display_text)
@@ -288,6 +288,12 @@ impl eframe::App for TimeCalc {
                     .font(egui::TextStyle::Monospace)
                     .interactive(false),
             );
+            if ui
+                .add_sized([144.0, total_height], egui::Button::new("AC"))
+                .clicked()
+            {
+                clear(self);
+            };
             egui::Grid::new("calc_grid")
                 .striped(true)
                 .min_col_width(30.0)
