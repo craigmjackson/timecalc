@@ -1,3 +1,4 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use eframe::egui;
 use timecalc::calc::calculate_input;
 use timecalc::calc::seconds_from_string;
