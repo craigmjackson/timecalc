@@ -61,6 +61,9 @@ jobs:
           # Include README
           cp README.md "$STAGING/"
 
+          # Include changelog
+          cp changelog.txt "$STAGING/"
+
           # Create Archive
           cd "$STAGING"
           if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
