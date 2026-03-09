@@ -51,11 +51,11 @@ jobs:
 
           # Move binaries to staging (adjust names to match your [[bin]] section)
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            cp target/${{ matrix.target }}/release/timecalc_gui.exe "$STAGING/"
-            cp target/${{ matrix.target }}/release/timecalc_cli.exe "$STAGING/"
+            cp target/${{ matrix.target }}/release/timecalc-gui.exe "$STAGING/"
+            cp target/${{ matrix.target }}/release/timecalc-cli.exe "$STAGING/"
           else
-            cp target/${{ matrix.target }}/release/timecalc_gui "$STAGING/"
-            cp target/${{ matrix.target }}/release/timecalc_cli "$STAGING/"
+            cp target/${{ matrix.target }}/release/timecalc-gui "$STAGING/"
+            cp target/${{ matrix.target }}/release/timecalc-cli "$STAGING/"
           fi
 
           # Include README
