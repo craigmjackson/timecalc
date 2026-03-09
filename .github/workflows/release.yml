@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           # Create a staging directory
-          STAGING="staging"
+          STAGING="timecalc-${{ github.ref_name }}"
           mkdir -p "$STAGING"
 
           # Move binaries to staging (adjust names to match your [[bin]] section)
@@ -65,16 +65,17 @@ jobs:
           cp changelog.txt "$STAGING/"
 
           # Create Archive
-          cd "$STAGING"
+
           if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-            tar -czf ../${{ matrix.artifact_name }}${{ matrix.asset_extension }} *
+            tar -czf ${{ matrix.artifact_name }}-${{ github.ref_name }}${{ matrix.asset_extension }} "$STAGING"
           else
-            7z a ../${{ matrix.artifact_name }}${{ matrix.asset_extension }} *
+            cd "$STAGING"
+            7z a ../${{ matrix.artifact_name }}-${{ github.ref_name}}${{ matrix.asset_extension }} *
           fi
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.artifact_name }}${{ matrix.asset_extension }}
+          files: ${{ matrix.artifact_name }}-${{ github.ref_name }}${{ matrix.asset_extension }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
